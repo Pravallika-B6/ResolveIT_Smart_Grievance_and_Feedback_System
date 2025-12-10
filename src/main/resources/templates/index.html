@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ResolveIT — Smart Grievance & Feedback Management System</title>
+  <meta name="description" content="ResolveIT: Report civic or organizational issues, track progress, and give feedback — all in one smart platform." />
+  <style>
+    :root{--accent:#0b74de;--muted:#6b7280;--bg:#f7f9fc;--card:#ffffff}
+    *{box-sizing:border-box}
+    body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; background:var(--bg); color:#102a43}
+    header{background:linear-gradient(90deg,#0b74de 0%, #0069c0 100%); color:white; padding:20px 24px}
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+    nav{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:700}
+    .brand svg{width:44px;height:44px}
+    .nav-actions{display:flex;gap:8px}
+    .btn{background:white;color:var(--accent);padding:8px 14px;border-radius:8px;border:none;font-weight:600;cursor:pointer}
+    .btn.ghost{background:transparent;color:white;border:1px solid rgba(255,255,255,0.18)}
+    main{padding:48px 0}
+    .hero{display:grid;grid-template-columns:1fr 420px;gap:36px;align-items:center}
+    .hero h1{font-size:28px;margin:0 0 12px}
+    .hero p{color:var(--muted);margin:0 0 18px;line-height:1.5}
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+    .card{background:var(--card);padding:18px;border-radius:10px;box-shadow:0 6px 18px rgba(12,38,63,0.06)}
+    .report-form{background:linear-gradient(180deg,#fff 0%, #f6fbff 100%);padding:18px;border-radius:10px}
+    label{display:block;font-size:13px;margin-bottom:6px;color:#0b3b5a}
+    input[type=text], textarea, select{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef6;background:white}
+    textarea{min-height:110px;resize:vertical}
+    .muted{color:var(--muted);font-size:13px}
+    footer{padding:28px 0;color:var(--muted)}
+    @media (max-width:920px){
+      .hero{grid-template-columns:1fr}
+      .features{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width:560px){
+      .features{grid-template-columns:1fr}
+      nav{flex-direction:column;align-items:flex-start}
+      .nav-actions{width:100%;justify-content:space-between}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <div class="brand">
+          <!-- Simple shield/check logo -->
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            <rect x="2" y="6" width="44" height="30" rx="6" fill="white" opacity="0.06"/>
+            <path d="M24 4L8 10v6c0 11 8 20 16 24 8-4 16-13 16-24V10L24 4z" fill="white" opacity="0.14"/>
+            <path d="M18 24l4 4 8-10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          ResolveIT
+        </div>
+        <div class="nav-actions">
+          <button class="btn ghost">How it works</button>
+          <button class="btn">Report Issue</button>
+          <button class="btn">Login</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div>
+        <h1>ResolveIT — Smart Grievance & Feedback Management</h1>
+        <p>Report problems, submit feedback, and track resolution status in real time. ResolveIT connects citizens and officials with a simple, secure, and transparent workflow.</p>
+        <div style="display:flex;gap:12px;align-items:center">
+          <button class="btn">Get Started</button>
+          <button class="btn ghost">Request Demo</button>
+        </div>
+
+        <div class="features">
+          <div class="card">
+            <h3 style="margin:0 0 8px">Easy Reporting</h3>
+            <p class="muted">Capture photos, select location, and submit details in under a minute.</p>
+          </div>
+          <div class="card">
+            <h3 style="margin:0 0 8px">Live Tracking</h3>
+            <p class="muted">Track ticket progress with status updates and timelines.</p>
+          </div>
+          <div class="card">
+            <h3 style="margin:0 0 8px">Actionable Insights</h3>
+            <p class="muted">Dashboards and reports help authorities prioritize and measure impact.</p>
+          </div>
+        </div>
+      </div>
+
+      <aside>
+        <div class="card report-form">
+          <h3 style="margin-top:0">Quick Report</h3>
+          <form id="quickReport" onsubmit="submitDemo(event)">
+            <label for="type">Issue Type</label>
+            <select id="type" required>
+              <option value="">Select issue</option>
+              <option>Road / Pothole</option>
+              <option>Garbage / Sanitation</option>
+              <option>Streetlight</option>
+              <option>Water Supply</option>
+              <option>Other</option>
+            </select>
+
+            <label for="location">Location (address or landmark)</label>
+            <input id="location" type="text" placeholder="e.g., MG Road, near City Library" required />
+
+            <label for="description">Short description</label>
+            <textarea id="description" placeholder="Describe the issue briefly" required></textarea>
+
+            <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
+              <button class="btn" type="submit">Submit</button>
+              <button class="btn ghost" type="button" onclick="clearForm()">Clear</button>
+            </div>
+            <p class="muted" style="margin-top:12px">No account required to file a complaint, but signing in lets you track progress and receive updates.</p>
+          </form>
+        </div>
+
+        <div style="margin-top:14px" class="card">
+          <h4 style="margin:0 0 8px">Recent Resolutions</h4>
+          <ul style="margin:0;padding-left:16px;color:var(--muted);font-size:14px">
+            <li>Pothole fixed on River Street — 2 days</li>
+            <li>Broken streetlight replaced in Sector 7 — 4 days</li>
+            <li>Overflowing drain cleared near Market Road — 1 day</li>
+          </ul>
+        </div>
+      </aside>
+    </section>
+
+    <section style="margin-top:36px">
+      <div class="card">
+        <h3 style="margin-top:0">How ResolveIT Works</h3>
+        <ol style="padding-left:20px;color:var(--muted)">
+          <li>Citizen files a report using the web portal or mobile app, attaching photos and location.</li>
+          <li>Report is triaged and routed to the responsible department or officer.</li>
+          <li>Officer updates status: acknowledged, in progress, resolved. Citizen receives notifications.</li>
+          <li>Feedback is collected after resolution to improve service quality.</li>
+        </ol>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="container">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div class="muted">© ResolveIT 2025 • Built for transparency & civic engagement</div>
+      <div style="display:flex;gap:12px">
+        <a class="muted" href="#">Privacy</a>
+        <a class="muted" href="#">Terms</a>
+        <a class="muted" href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function submitDemo(e){
+      e.preventDefault();
+      const type = document.getElementById('type').value;
+      const loc = document.getElementById('location').value.trim();
+      const desc = document.getElementById('description').value.trim();
+      if(!type || !loc || !desc){ alert('Please fill all fields.'); return }
+      // Demo behaviour: show a friendly confirmation and reset
+      alert('Thank you! Your report has been submitted (demo). Ticket ID: DEMO-' + Math.floor(Math.random()*90000+10000));
+      document.getElementById('quickReport').reset();
+    }
+    function clearForm(){ document.getElementById('quickReport').reset(); }
+  </script>
+</body>
+</html>

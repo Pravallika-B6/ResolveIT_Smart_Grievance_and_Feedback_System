@@ -1,0 +1,101 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #4a90e2, #005bea);
+}
+
+/* Signup Container */
+.signup-container {
+    background: #ffffff;
+    padding: 40px 35px;
+    width: 380px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    text-align: center;
+}
+
+.signup-container h2 {
+    margin-bottom: 25px;
+    font-size: 28px;
+    color: #333;
+}
+
+/* Inputs + Role Dropdown */
+.signup-container input,
+.signup-container select {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    transition: 0.3s ease;
+    background-color: #fff;
+}
+
+/* Focus Effect */
+.signup-container input:focus,
+.signup-container select:focus {
+    border-color: #4a90e2;
+    outline: none;
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+}
+
+/* OTP Button */
+.otp-btn {
+    width: 100%;
+    padding: 12px;
+    background: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.otp-btn:hover {
+    background: #357acb;
+}
+
+.otp-btn:disabled {
+    background: #888;
+    cursor: not-allowed;
+}
+
+/* Submit Button */
+#submitBtn {
+    width: 100%;
+    padding: 12px;
+    background: #005bea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+#submitBtn:hover {
+    background: #0041b3;
+}
+
+/* Mobile Responsive */
+@media (max-width: 420px) {
+    .signup-container {
+        width: 90%;
+        padding: 30px 20px;
+    }
+}

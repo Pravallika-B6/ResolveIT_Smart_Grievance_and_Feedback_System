@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Complaint Management System</title>
+  <style>
+    :root{--accent:#2563eb;--danger:#dc2626;--muted:#6b7280}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f7fafc;color:#111;margin:0;padding:24px}
+    .card{max-width:900px;margin:16px auto;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(16,24,40,.08);padding:20px}
+    h1{margin:0 0 12px;font-size:20px}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
+    input[type=text],select,textarea{width:100%;padding:10px;border:1px solid #e6edf3;border-radius:8px;font-size:14px}
+    textarea{min-height:110px;resize:vertical}
+    .col{flex:1;min-width:220px}
+    .full{width:100%}
+    .small{max-width:200px}
+    .priority{display:flex;gap:8px;align-items:center}
+    .btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:10px;border:none;cursor:pointer}
+    .btn.secondary{background:#eef2ff;color:var(--accent);border:1px solid rgba(37,99,235,.12)}
+    .hint{font-size:12px;color:var(--muted);margin-top:6px}
+    .file-list{margin-top:10px}
+    .file-item{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid #f1f5f9;border-radius:8px;margin-bottom:8px}
+    .file-item img{width:56px;height:56px;object-fit:cover;border-radius:6px;border:1px solid #eee}
+    .file-meta{flex:1}
+    .file-actions button{background:transparent;border:none;color:var(--danger);cursor:pointer}
+    .dropzone{border:2px dashed #e6edf3;padding:18px;border-radius:10px;text-align:center;color:var(--muted);cursor:pointer}
+    .error{color:var(--danger);font-size:13px;margin-top:8px}
+    @media (max-width:640px){.row{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Complaint Management Form</h1>
+    <form id="complaintForm" autocomplete="off">
+      <div class="row">
+        <div class="col">
+          <label for="category">Category (choose one)</label>
+          <select id="category" name="category" required>
+            <option value="">-- Select category --</option>
+            <option value="infrastructure">Infrastructure</option>
+            <option value="sanitation">Sanitation</option>
+            <option value="water">Water Supply</option>
+            <option value="electricity">Electricity</option>
+            <option value="traffic">Traffic / Road Safety</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="col">
+          <label for="subcategory">Subcategory (auto)</label>
+          <select id="subcategory" name="subcategory">
+            <option value="">-- Select subcategory --</option>
+          </select>
+        </div>
+
+        <div class="col small">
+          <label for="priority">Priority</label>
+          <select id="priority" name="priority" required>
+            <option value="">-- Priority --</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="urgent">Urgent</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <label for="title">Complaint Title</label>
+        <input id="title" name="title" type="text" placeholder="Short title e.g. Pothole near gate" required />
+      </div>
+
+      <div style="margin-top:12px">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" placeholder="Describe the issue with details and location" required></textarea>
+      </div>
+
+      <div style="margin-top:12px">
+        <label>Upload files and images</label>
+        <div id="dropzone" class="dropzone" tabindex="0">Click or drag & drop files here — images, pdfs, docs (max 5 files)</div>
+        <div class="hint">Accepted: jpg, png, gif, pdf, doc, docx. Max file size: 5 MB each.</div>
+        <div id="error" class="error" style="display:none"></div>
+        <div id="fileList" class="file-list"></div>
+      </div>
+
+      <div style="margin-top:16px;display:flex;gap:10px;align-items:center">
+        <button type="submit" class="btn">Submit Complaint</button>
+        <button type="button" id="clearBtn" class="btn secondary">Clear Form</button>
+      </div>
+
+    </form>
+  </div>
+
+  <script>
+    // --- Category -> Subcategory mapping ---
+    const subcategories = {
+      infrastructure: ["Pothole", "Broken footpath", "Streetlight issue", "Drainage problem"],
+      sanitation: ["Garbage collection", "Open defecation", "Overflowing bins"],
+      water: ["No supply", "Leakage", "Contaminated water"],
+      electricity: ["Power outage", "Transformer issue", "Sparking wires"],
+      traffic: ["Signal malfunction", "Unauthorized parking", "Accident-prone spot"],
+      other: ["General"]
+    };
+
+    const categoryEl = document.getElementById('category');
+    const subcategoryEl = document.getElementById('subcategory');
+    const dropzone = document.getElementById('dropzone');
+    const fileListEl = document.getElementById('fileList');
+    const errorEl = document.getElementById('error');
+
+    let files = []; // store File objects (client-side only)
+    const MAX_FILES = 5;
+    const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+    const ALLOWED = ['image/jpeg','image/png','image/gif','application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+    categoryEl.addEventListener('change', ()=>{
+      const v = categoryEl.value;
+      populateSubcategories(v);
+    });
+
+    function populateSubcategories(cat){
+      subcategoryEl.innerHTML = '<option value="">-- Select subcategory --</option>';
+      if(!cat || !subcategories[cat]) return;
+      for(const s of subcategories[cat]){
+        const opt = document.createElement('option'); opt.value = s.toLowerCase().replace(/\s+/g,'_'); opt.textContent = s; subcategoryEl.appendChild(opt);
+      }
+    }
+
+    // Dropzone handlers
+    ;['dragenter','dragover'].forEach(e=>dropzone.addEventListener(e, ev=>{ ev.preventDefault(); dropzone.style.borderColor = 'rgba(37,99,235,0.8)'; }));
+    ;['dragleave','drop','blur'].forEach(e=>dropzone.addEventListener(e, ev=>{ ev.preventDefault(); dropzone.style.borderColor = '#e6edf3'; }));
+
+    dropzone.addEventListener('click', ()=>{ openFilePicker(); });
+    dropzone.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' ') openFilePicker(); });
+    dropzone.addEventListener('drop', (e)=>{ handleFiles(Array.from(e.dataTransfer.files)); });
+
+    function openFilePicker(){
+      const inp = document.createElement('input'); inp.type='file'; inp.multiple=true; inp.accept='image/*,application/pdf,.doc,.docx';
+      inp.onchange = ()=>{ handleFiles(Array.from(inp.files)); }
+      inp.click();
+    }
+
+    function handleFiles(selected){
+      errorEl.style.display='none';
+      for(const f of selected){
+        if(files.length >= MAX_FILES){ showError('Maximum '+MAX_FILES+' files allowed'); break; }
+        if(f.size > MAX_SIZE){ showError(`File "${f.name}" exceeds 5 MB`); continue; }
+        if(!ALLOWED.includes(f.type) && !f.name.match(/\.docx?$/i)) { showError(`File type not allowed: ${f.name}`); continue; }
+        files.push(f);
+      }
+      renderFileList();
+    }
+
+    function showError(msg){ errorEl.textContent = msg; errorEl.style.display='block'; }
+
+    function renderFileList(){
+      fileListEl.innerHTML = '';
+      files.forEach((f, idx)=>{
+        const div = document.createElement('div'); div.className='file-item';
+        const thumb = document.createElement('div');
+        if(f.type.startsWith('image/')){
+          const img = document.createElement('img'); img.src = URL.createObjectURL(f); img.alt = f.name; thumb.appendChild(img);
+        } else {
+          const img = document.createElement('img'); img.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><rect width="56" height="56" fill="%23eef2ff"/><text x="28" y="34" font-size="13" text-anchor="middle" fill="%232563eb">DOC</text></svg>';
+          thumb.appendChild(img);
+        }
+        const meta = document.createElement('div'); meta.className='file-meta';
+        meta.innerHTML = `<strong>${escapeHtml(f.name)}</strong><div class="hint">${(f.size/1024/1024).toFixed(2)} MB</div>`;
+        const actions = document.createElement('div'); actions.className='file-actions';
+        const removeBtn = document.createElement('button'); removeBtn.type='button'; removeBtn.textContent='Remove'; removeBtn.addEventListener('click', ()=>{ files.splice(idx,1); renderFileList(); });
+        actions.appendChild(removeBtn);
+        div.appendChild(thumb); div.appendChild(meta); div.appendChild(actions);
+        fileListEl.appendChild(div);
+      });
+    }
+
+    function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    // Form submit (client-only demo)
+    document.getElementById('complaintForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      errorEl.style.display='none';
+      const form = e.target;
+      // Basic validation
+      if(!form.category.value){ showError('Please choose a category'); return; }
+      if(!form.priority.value){ showError('Please select priority'); return; }
+      if(!form.title.value.trim()){ showError('Please enter a title'); return; }
+      // Build payload (for demonstration). In real app: use FormData and POST to server endpoint.
+      const payload = {
+        category: form.category.value,
+        subcategory: form.subcategory.value,
+        priority: form.priority.value,
+        title: form.title.value.trim(),
+        description: form.description.value.trim(),
+        files: files.map(f=>({name:f.name,size:f.size,type:f.type}))
+      };
+
+      // Show a quick success view
+      alert('Complaint prepared to be submitted.\n\n' + JSON.stringify(payload, null, 2));
+
+      // If you had a backend, you'd do something like:
+      // const fd = new FormData(); fd.append('category', payload.category); ... files.forEach(f=>fd.append('files', f));
+      // fetch('/api/complaints', {method:'POST', body: fd})
+
+      // Reset form for demo
+      form.reset(); files = []; renderFileList();
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', ()=>{ document.getElementById('complaintForm').reset(); files = []; renderFileList(); errorEl.style.display='none'; });
+
+  </script>
+</body>
+</html>

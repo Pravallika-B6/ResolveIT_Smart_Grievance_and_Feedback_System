@@ -1,0 +1,39 @@
+package com.example.demo.Model;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import lombok.AllArgsConstructor;
+
+@Service
+@AllArgsConstructor
+public class MyAppUserServices implements UserDetailsService {
+
+    @Autowired
+    private MyAppUserRepositry repositry;
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException{
+        Optional<MyAppUser> user = repositry.findByEmail(email);
+
+        if(user.isPresent()){
+            var userObj = user.get();
+            
+            return User.builder()
+                
+                .username(userObj.getEmail())
+                .password(userObj.getPassword())
+                .roles("USER")
+                .build();
+        } else {
+            throw new UsernameNotFoundException(email + " not found");
+        }
+    }
+    
+}

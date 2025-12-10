@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup Page</title>
+    <link rel="stylesheet" href="/css/signup.css">
+</head>
+
+<body>
+    <div class="signup-container">
+        <h2>Sign Up</h2>
+
+        <form id="signupForm" action="#" method="post">
+            <input type="text" id="fullname" name="fullname" placeholder="Full Name" required>
+            <input type="email" id="email" name="email" placeholder="Email" required>
+            <input type="text" id="username" name="username" placeholder="Username" required>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password"
+                required>
+
+            <select id="role" name="role" required>
+                <option value="" disabled selected>Select Role</option>
+                <option value="user">User</option>
+                <option value="officer">Officer</option>
+                <option value="admin">Admin</option>
+            </select>
+
+            <button type="submit" id="submitBtn">Sign Up</button>
+        </form>
+
+        <script src="/js/script.js"></script>
+    </div>
+
+</body>
+
+</html>
+
+<script>
+    // Your JavaScript code to handle form submission (like the one you started)
+    document.getElementById('signupForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // Stop the form from submitting normally
+
+        const fullname = document.getElementById('fullname').value;
+        const email = document.getElementById('email').value;
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const role = document.getElementById('role').value;
+        const confirmPassword = document.getElementById('confirm_password').value;
+
+        // 1. **Client-side validation (Crucial!):**
+        if (password !== confirmPassword) {
+            alert("Passwords do not match!");
+            return;
+        }
+
+        // 2. **Send data to Spring Boot backend (AJAX/Fetch):**
+        sendDataToSpringBoot(fullname, email, username, password, role);
+    });
+
+    function sendDataToSpringBoot(fullname, email, username, password, role) {
+        // This is where you make an HTTP POST request to your Spring Boot REST endpoint
+        fetch('http://localhost:1234/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                fullname: fullname,
+                email: email,
+                username: username,
+                // You should hash the password on the backend, but we send the plain text for now
+                password: password,
+                role: role
+            }),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    // Handle HTTP errors
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); // or response.text()
+            })
+            .then(data => {
+                console.log('Success:', data);
+                alert('Signup successful!');
+                // Redirect the user
+                // window.location.href = 'login.html'; 
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Signup failed. Please try again.');
+            });
+    }
+</script>
